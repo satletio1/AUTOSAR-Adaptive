@@ -1,5 +1,5 @@
 # Base image is the Ubuntu Focal from Docker Hub
-FROM ubuntu:focal
+FROM ubuntu:focal AS baseImage
 
 LABEL maintainer="Bartosz Burda <Bartosz.Burda@umlaut.com>"
 
@@ -52,3 +52,18 @@ RUN sudo usermod -aG sudo dev
 # Set user and work directory
 USER dev
 WORKDIR /home/dev
+
+FROM baseImage AS doxygenImage
+
+USER root
+
+RUN DEBIAN_FRONTEND=noninteractive apt -qq update && \
+       apt -qq install -y \
+       sudo \
+       flex \
+       bison \
+       libc6 \
+       make \
+       binutils
+
+USER dev
