@@ -1,48 +1,5 @@
-FROM ubuntu:focal AS baseDoxygenImage
-
-LABEL maintainer="Bartosz Burda <Bartosz.Burda@umlaut.com>"
-
-# Set the env variables
-ENV CXX=/usr/bin/g++-10 \
-    CC=/usr/bin/gcc-10 \
-# This should be changed to your Timezone
-    TZ=Europe/Warsaw
-
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# Add x86 support
-RUN dpkg --add-architecture i386
-
-# Install dependencies using apt
-RUN DEBIAN_FRONTEND=noninteractive apt -qq update && \
-       apt -qq install -y \
-       sudo \
-       wget \
-       git
-	   #curl \
-	   #gcc-10 \ 
-	   #g++-10 \
-       #cmake \
-	   ##ninja-build \
-       #graphviz \
-       #flex \
-       #bison \  
-       #libc6 \
-       #make \
-       #binutils
-
-RUN mkdir /home/doxygen_repo \
-       cd /home/doxygen_repo \
-       git clone https://github.com/UmlautSoftwareDevelopmentAccount/doxygen.git
-       #cd /home/doxygen_repo/doxygen \
-       #mkdir build \
-       #cd build \
-       #cmake -Dbuild_wizard=NO -G "Ninja" .. \
-       #ninja
-
-
 # Base image is the Ubuntu Focal from Docker Hub
-FROM baseDoxygenImage AS finalDevImage
+FROM ubuntu:focal AS baseImage
 
 LABEL maintainer="Bartosz Burda <Bartosz.Burda@umlaut.com>"
 
@@ -75,7 +32,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt -qq update && \
 	   python3 \
 	   python3-pip \
        python3-setuptools \
-       python3-wheel 
+       python3-wheel \
+       doxygen \
+       graphviz \
+       clang-tidy \
+       flex \
+       bison \
+       libc6 \
+       make \
+       binutils
        
 # Install Python packages: Meson, Conan and gcovr
 RUN pip3 install meson conan gcovr
